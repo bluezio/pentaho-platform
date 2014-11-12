@@ -52,6 +52,7 @@ pen.define([
     FileBrowser.fileBrowserView = null;
     FileBrowser.openFileHandler = undefined;
     FileBrowser.showHiddenFiles = false;
+    FileBrowser.showHomes = false;
     FileBrowser.showDescriptions = false;
     FileBrowser.canDownload = false;
     FileBrowser.canPublish = false;
@@ -81,6 +82,10 @@ pen.define([
 
     FileBrowser.setShowHiddenFiles = function (value) {
         this.showHiddenFiles = value;
+    };
+
+    FileBrowser.setShowHomes = function (value) {
+        this.showHomes = value;
     };
 
     FileBrowser.setShowDescriptions = function (value) {
@@ -126,6 +131,7 @@ pen.define([
                 spinConfig: spin,
                 openFileHandler: myself.openFileHandler,
                 showHiddenFiles: myself.showHiddenFiles,
+                showHomes: myself.showHomes,
                 showDescriptions: myself.showDescriptions,
                 canDownload: myself.canDownload,
                 canPublish: myself.canPublish,
@@ -153,6 +159,7 @@ pen.define([
     var FileBrowserModel = Backbone.Model.extend({
         defaults: {
             showHiddenFilesURL: CONTEXT_PATH + "api/user-settings/MANTLE_SHOW_HIDDEN_FILES",
+            showHomesURL: CONTEXT_PATH + "api/user-settings/MANTLE_SHOW_HOMES",
 
             fileButtons: fileButtons,
             folderButtons: folderButtons,
@@ -173,6 +180,7 @@ pen.define([
             openFileHandler: undefined,
 
             showHiddenFiles: false,
+            showHomes: true,
             showDescriptions: false,
 
             canDownload: false,
@@ -201,6 +209,7 @@ pen.define([
             foldersTreeModel = new FileBrowserFolderTreeModel({
                 spinner: spinner1,
                 showHiddenFiles: myself.get("showHiddenFiles"),
+                showHomes: myself.get("showHomes"),
                 showDescriptions: myself.get("showDescriptions"),
                 startFolder: myself.get("startFolder")
             });
@@ -379,6 +388,7 @@ pen.define([
             spinner: undefined,
 
             showHiddenFiles: false,
+            showHomes: true,
             showDescriptions: false,
 
             startFolder: "/",
@@ -396,8 +406,12 @@ pen.define([
             var myself = this;
 
             myself.set("runSpinner", true);
+            var path = "/";
+            if (this.get("showHomes") == false) {
+				path = "/public";
+			}
 
-            myself.fetchData("/", function (response) {
+            myself.fetchData(path, function (response) {
                 var trash = {
                     "file": {
                         "trash": "trash",
@@ -1132,6 +1146,7 @@ pen.define([
         setContainer: FileBrowser.setContainer,
         setOpenFileHandler: FileBrowser.setOpenFileHandler,
         setShowHiddenFiles: FileBrowser.setShowHiddenFiles,
+        setShowHomes: FileBrowser.setShowHomes,
         setShowDescriptions: FileBrowser.setShowDescriptions,
         setCanDownload: FileBrowser.setCanDownload,
         setCanPublish: FileBrowser.setCanPublish,

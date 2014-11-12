@@ -294,6 +294,11 @@ public class MantleModel extends XulEventSourceAdapter implements SolutionBrowse
   }
 
   @Bindable
+  public void toggleShowHomes() {
+    SolutionBrowserPanel.getInstance().toggleShowHomesCommand.execute();
+  }
+
+  @Bindable
   public void openDocumentation() {
     OpenDocCommand cmd = new OpenDocCommand();
     cmd.execute();

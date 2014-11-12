@@ -62,6 +62,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class SolutionTree extends Tree implements IRepositoryFileTreeListener, UserSettingsLoadedEventHandler, IRepositoryFileProvider {
   private boolean showLocalizedFileNames = true;
   private boolean showHiddenFiles = false;
+  private boolean showHomes = false;
   private boolean isAdministrator = false;
   private boolean createRootNode = false;
   private boolean useDescriptionsForTooltip = false;
@@ -178,6 +179,9 @@ public class SolutionTree extends Tree implements IRepositoryFileTreeListener, U
         } else if (IMantleUserSettingsConstants.MANTLE_SHOW_HIDDEN_FILES.equals(setting.getName())) {
           boolean showHiddenFiles = "true".equals(setting.getValue()); //$NON-NLS-1$
           setShowHiddenFiles(showHiddenFiles);
+        } else if (IMantleUserSettingsConstants.MANTLE_SHOW_HOMES.equals(setting.getName())) {
+          boolean showHomes = "true".equals(setting.getValue()); //$NON-NLS-1$
+          setShowHomes(showHomes);
         }
       }
     }
@@ -609,6 +613,14 @@ public class SolutionTree extends Tree implements IRepositoryFileTreeListener, U
 
   public void setShowHiddenFiles(boolean showHiddenFiles) {
     this.showHiddenFiles = showHiddenFiles;
+  }
+
+  public boolean isShowHomes() {
+    return showHomes;
+  }
+
+  public void setShowHomes( boolean showHomes ) {
+    this.showHomes = showHomes;
   }
 
   public boolean isShowLocalizedFileNames() {

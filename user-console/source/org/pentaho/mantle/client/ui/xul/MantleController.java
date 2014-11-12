@@ -112,6 +112,8 @@ public class MantleController extends AbstractXulEventHandler {
 
   private XulMenuitem showHiddenFilesMenuItem;
 
+  private XulMenuitem showHomesMenuItem;
+
   private XulMenubar languageMenu;
 
   private XulMenubar themesMenu;
@@ -180,6 +182,7 @@ public class MantleController extends AbstractXulEventHandler {
     saveAsMenuItem = (XulMenuitem) document.getElementById("saveAsMenuItem"); //$NON-NLS-1$
     useDescriptionsMenuItem = (XulMenuitem) document.getElementById("useDescriptionsMenuItem"); //$NON-NLS-1$
     showHiddenFilesMenuItem = (XulMenuitem) document.getElementById("showHiddenFilesMenuItem"); //$NON-NLS-1$
+    showHomesMenuItem = (XulMenuitem) document.getElementById( "showHomesMenuItem" ); //$NON-NLS-1$
     languageMenu = (XulMenubar) document.getElementById("languagemenu"); //$NON-NLS-1$
     themesMenu = (XulMenubar) document.getElementById("themesmenu"); //$NON-NLS-1$
     toolsMenu = (XulMenubar) document.getElementById("toolsmenu"); //$NON-NLS-1$
@@ -259,6 +262,7 @@ public class MantleController extends AbstractXulEventHandler {
                     public void onResponseReceived(Request request, Response response) {
                       toolsMenu.setVisible("true".equalsIgnoreCase(response.getText())); //$NON-NLS-1$
                       showHiddenFilesMenuItem.setVisible("true".equalsIgnoreCase(response.getText())); //$NON-NLS-1$
+                      showHomesMenuItem.setVisible( "true".equalsIgnoreCase( response.getText() ) ); //$NON-NLS-1$
                     }
 
                   });
@@ -323,6 +327,9 @@ public class MantleController extends AbstractXulEventHandler {
         } else if (IMantleUserSettingsConstants.MANTLE_SHOW_HIDDEN_FILES.equals(setting.getName())) {
           boolean checked = "true".equals(setting.getValue()); //$NON-NLS-1$
           ((PentahoMenuItem) showHiddenFilesMenuItem.getManagedObject()).setChecked(checked);
+        } else if ( IMantleUserSettingsConstants.MANTLE_SHOW_HOMES.equals( setting.getName() ) ) {
+          boolean checked = "true".equals(setting.getValue()); //$NON-NLS-1$
+          ((PentahoMenuItem) showHomesMenuItem.getManagedObject()).setChecked(checked);
         }
       } catch (Exception e) {
         MessageDialogBox dialogBox = new MessageDialogBox(Messages.getString("error"), Messages.getString("couldNotGetUserSettings"), false, false, true); //$NON-NLS-1$ //$NON-NLS-2$
@@ -937,6 +944,13 @@ public class MantleController extends AbstractXulEventHandler {
     boolean checked = ((PentahoMenuItem) showHiddenFilesMenuItem.getManagedObject()).isChecked();
     ((PentahoMenuItem) showHiddenFilesMenuItem.getManagedObject()).setChecked(!checked);
     SolutionBrowserPanel.getInstance().toggleShowHideFilesCommand.execute();
+  }
+
+  @Bindable
+  public void showHomesClicked() {
+    boolean checked = ( (PentahoMenuItem) showHomesMenuItem.getManagedObject() ).isChecked();
+    ( (PentahoMenuItem) showHomesMenuItem.getManagedObject() ).setChecked( !checked );
+    SolutionBrowserPanel.getInstance().toggleShowHomesCommand.execute();
   }
 
   @Bindable

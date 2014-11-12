@@ -51,12 +51,13 @@
 
         var FileBrowser = null;
 
-        function initBrowser(canDownload, showHiddenFiles, showDescriptions, canPublish){
+        function initBrowser(canDownload, showHiddenFiles, showHomes, showDescriptions, canPublish){
             pen.require(["js/browser"], function(pentahoFileBrowser) {
                 FileBrowser = pentahoFileBrowser;
                 FileBrowser.setOpenFileHandler(openRepositoryFile);
                 FileBrowser.setContainer($("#fileBrowser"));
                 FileBrowser.setShowHiddenFiles(showHiddenFiles);
+                FileBrowser.setShowHomes(showHomes);
                 FileBrowser.setShowDescriptions(showDescriptions);
                 FileBrowser.setCanDownload(canDownload);
 				FileBrowser.setCanPublish(canPublish);
@@ -67,6 +68,15 @@
                 window.top.mantle_addHandler("ShowHiddenFilesEvent", function(event){
                     if(event.value != undefined){
                         FileBrowser.setShowHiddenFiles(event.value);
+                        FileBrowser.update(window.top.HOME_FOLDER);
+                    }
+                });
+
+                window.top.mantle_addHandler("ShowHomesEvent", function (event) {
+                    if (event.value != undefined) {
+                        //Clear the Browse Perspective cache
+                        window.top.mantle_isBrowseRepoDirty = true;
+                        FileBrowser.setShowHomes(event.value);
                         FileBrowser.update(window.top.HOME_FOLDER);
                     }
                 });
@@ -174,38 +184,52 @@
                 type: "GET",
                 async: true,
                 success: function(response){
-                    checkShowDescriptions(canDownload, response == "true");
+                    checkShowHomes(canDownload, response == "true");
                 },
                 error: function(response){
-                    checkShowDescriptions(canDownload, false);
+                    checkShowHomes(canDownload, false);
                 }
             });
         }
 
-        function checkShowDescriptions(canDownload, showHiddenFiles){
+        function checkShowHomes(canDownload, showHiddenFiles) {
+            $.ajax({
+                url: CONTEXT_PATH + "api/user-settings/MANTLE_SHOW_HOMES",
+                type: "GET",
+                async: true,
+                success: function (response) {
+                    checkShowDescriptions(canDownload, showHiddenFiles, response == "true");
+                },
+                error: function (response) {
+                    checkShowDescriptions(canDownload, showHiddenFiles, false);
+                }
+            });
+        }
+
+        function checkShowDescriptions(canDownload, showHiddenFiles, showHomes){
             $.ajax({
                 url: CONTEXT_PATH + "api/user-settings/MANTLE_SHOW_DESCRIPTIONS_FOR_TOOLTIPS",
                 type: "GET",
                 async: true,
                 success: function(response){
-                    checkPublish(canDownload, showHiddenFiles, (response == "true"));
+                    checkPublish(canDownload, showHiddenFiles, showHomes, (response == "true"));
                 },
                 error: function(response){
-                    checkPublish(canDownload, showHiddenFiles, false);
+                    checkPublish(canDownload, showHiddenFiles, showHomes, false);
                 }
             });
         }
 
-        function checkPublish(canDownload, showHiddenFiles, showDescriptions){
+        function checkPublish(canDownload, showHiddenFiles, showHomes, showDescriptions){
             $.ajax({
                 url: CONTEXT_PATH + "api/authorization/action/isauthorized?authAction=org.pentaho.security.administerSecurity",
                 type: "GET",
                 async: true,
                 success: function(response){
-                    initBrowser(canDownload, showHiddenFiles, showDescriptions, (response == "true"));
+                    initBrowser(canDownload, showHiddenFiles, showHomes, showDescriptions, (response == "true"));
                 },
                 error: function(response){
-                    initBrowser(canDownload, showHiddenFiles, showDescriptions, false);
+                    initBrowser(canDownload, showHiddenFiles, showHomes, showDescriptions, false);
                 }
             });
         }

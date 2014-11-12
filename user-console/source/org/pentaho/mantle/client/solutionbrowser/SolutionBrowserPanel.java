@@ -31,12 +31,7 @@ import org.pentaho.mantle.client.commands.AbstractCommand;
 import org.pentaho.mantle.client.commands.ExecuteUrlInNewTabCommand;
 import org.pentaho.mantle.client.commands.ShareFileCommand;
 import org.pentaho.mantle.client.dialogs.scheduling.ScheduleHelper;
-import org.pentaho.mantle.client.events.EventBusUtil;
-import org.pentaho.mantle.client.events.ShowDescriptionsEvent;
-import org.pentaho.mantle.client.events.ShowHiddenFilesEvent;
-import org.pentaho.mantle.client.events.SolutionBrowserSelectEvent;
-import org.pentaho.mantle.client.events.SolutionBrowserSelectEventHandler;
-import org.pentaho.mantle.client.events.SolutionFileHandler;
+import org.pentaho.mantle.client.events.*;
 import org.pentaho.mantle.client.messages.Messages;
 import org.pentaho.mantle.client.objects.SolutionFileInfo;
 import org.pentaho.mantle.client.solutionbrowser.PluginOptionsHelper.ContentTypePlugin;
@@ -150,6 +145,31 @@ public class SolutionBrowserPanel extends HorizontalPanel {
       }
     }
   };
+
+  public Command toggleShowHomesCommand = new Command() {
+    public void execute() {
+      solutionTree.setShowHomes(!solutionTree.isShowHomes());
+      solutionTree.setSelectedItem(solutionTree.getSelectedItem(), true);
+
+      // send event
+      final ShowHomesEvent event = new ShowHomesEvent();
+      event.setValue(solutionTree.isShowHomes());
+      EventBusUtil.EVENT_BUS.fireEvent(event);
+
+      // update setting
+      final String url = GWT.getHostPageBaseURL() + "api/user-settings/MANTLE_SHOW_HOMES"; //$NON-NLS-1$
+      RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, url);
+      try {
+        builder.setHeader("If-Modified-Since", "01 Jan 1970 00:00:00 GMT");
+        builder.sendRequest("" + solutionTree.isShowHomes(), EmptyRequestCallback.getInstance());
+        RepositoryFileTreeManager.getInstance().fetchRepositoryFileTree(true, null, null,
+                solutionTree.isShowHomes());
+      } catch (RequestException e) {
+        // showError(e);
+      }
+    }
+  };
+
 
   public Command toggleUseDescriptionCommand = new Command() {
     public void execute() {
